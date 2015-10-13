@@ -1,0 +1,22 @@
+{
+  "name": "drag-and-drop-js",
+  "version": "0.1.0",
+  "homepage": "https://github.com/France-ioi/drag-and-drop-js",
+  "authors": [
+    "France IOI"
+  ],
+  "description": "High level drag and drop lib",
+  "main": "dst/drag-and-drop.min.js",
+  "moduleType": [],
+  "license": "MIT",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "raphael": "~2.1.4"
+  }
+}
