@@ -1,0 +1,127 @@
+/*     example component
+var paper = Raphael(50,50,500,500);
+paper.rect(0,0,500,500).attr('fill','gray');
+var c = paper.circle(100,100,50).attr('fill','red');
+var r = paper.rect(0,0,30,20).attr('fill','blue');
+var t = paper.text(100,100,'bonjour');
+t.transform('t150,0');
+var im = paper.image('im.png',200,200,100,100);
+
+var group = component(100,100,[c,r,t,im]);
+var startDrag = function() { this.oldcx = this.cx; this.oldcy = this.cy; }
+var moveDrag = function(dx,dy){ this.placeAt(this.oldcx+dx, dy+this.oldcy+dy); }
+var upDrag = function(){}
+group.drag(moveDrag, startDrag, upDrag);
+*/
+
+
+
+
+/* Example Multi-stacks
+
+//Multi-stacks
+var dragAndDrop = DragAndDropSystem(paper);
+
+var nbStacks = 4, nbPlaces = 7;
+var widthPlace = 40, heightPlace = 50;
+
+var sizeStack = new Array();
+var colors = ['red','yellow','green','brown','purple']
+
+for(var iStack = 0; iStack < nbStacks; iStack++)
+{
+	var cx = 100 + iStack*80, cy = 250;
+	var rect = paper.rect(-widthPlace/2,-heightPlace/2,widthPlace,heightPlace).attr('fill','blue');
+	var cont = dragAndDrop.addContainer(iStack,cx, cy, nbPlaces, widthPlace, heightPlace, 
+		'vertical', 'bottom','replace', [rect]);
+
+	for(var i = 1; i <= nbPlaces - 2; i++)
+	{ 
+		var circle = paper.circle(0,0,20).attr('fill',colors[iStack]);
+		var text = paper.text(0,0, i);
+		cont.createDraggable('', i-1, [circle,text]);
+	}
+	sizeStack[iStack] = nbPlaces - 2;
+}
+
+dragAndDrop.canBeTaken = function(contId, pos) { return pos == sizeStack[contId]-1; };
+
+dragAndDrop.canBeDropped = function(srcContId, srcPos, dstContId, dstPos, dropType)
+{
+	if(srcContId != dstContId)	
+		return dstPos == sizeStack[dstContId]; 
+	return dstPos == sizeStack[dstContId]-1; 
+};
+
+dragAndDrop.drop = function(srcContId, srcPos, dstContId, dstPos, dropType)
+{
+	sizeStack[srcContId]--;
+	sizeStack[dstContId]++;
+};
+*/
+
+/*
+//Multi-stacks + autre
+var dragAndDrop = DragAndDropSystem(paper);
+
+var nbStacks = 4, nbPlaces = 7;
+var widthPlace = 40, heightPlace = 50;
+
+var sizeStack = new Array();
+var colors = ['red','yellow','green','brown','purple']
+
+for(var iStack = 0; iStack < nbStacks; iStack++)
+{
+	var cx = 100 + iStack*80, cy = 250;
+	var rect = paper.rect(-widthPlace/2,-heightPlace/2,widthPlace,heightPlace).attr('fill','blue');
+	var cont = dragAndDrop.addContainer(iStack,cx, cy, nbPlaces, widthPlace, heightPlace, 
+		'vertical', 'bottom','replace', 'marker', [rect]);
+
+	for(var i = 1; i <= nbPlaces - 2; i++)
+	{ 
+		var circle = paper.circle(0,0,20).attr('fill',colors[iStack]);
+		var text = paper.text(0,0, i);
+		cont.createDraggable('<' + iStack + ',' + i + '>', i-1, [circle,text]);
+	}
+	sizeStack[iStack] = nbPlaces - 2;
+}
+
+var rect = paper.rect(-widthPlace/2,-heightPlace/2,widthPlace,heightPlace).attr('fill','gray');
+var insertList = dragAndDrop.addContainer(nbStacks,450, 250, 5, widthPlace, heightPlace, 
+		'vertical', 'bottom', 'insertBefore', 'marker', [rect]);
+
+var inds = new Array(0,1,3,4);
+for(i in inds)
+{ 
+	var circle = paper.circle(0,0,20).attr('fill','pink');
+	var text = paper.text(0,0, inds[i]);
+	insertList.createDraggable('<l,' + inds[i] + '>', inds[i], [circle,text]);
+}
+
+
+dragAndDrop.canBeTaken = function(contId, pos) 
+{ 
+	if(contId >= nbStacks)
+		return true;
+	return pos == sizeStack[contId]-1; 
+};
+
+dragAndDrop.canBeDropped = function(srcContId, srcPos, dstContId, dstPos, dropType)
+{
+	if(dstContId >= nbStacks)
+		return true;
+	if(srcContId != dstContId)	
+		return dstPos == sizeStack[dstContId]; 
+	return dstPos == sizeStack[dstContId]-1; 
+};
+
+dragAndDrop.drop = function(srcContId, srcPos, dstContId, dstPos, dropType)
+{
+	if(srcContId < nbStacks)
+		sizeStack[srcContId]--;
+	if(dstContId < nbStacks)
+		sizeStack[dstContId]++;
+};
+*/
+
+
