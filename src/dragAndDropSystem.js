@@ -31,6 +31,7 @@ Callbacks :
 */
 function _DragAndDropSystem(paper)
 {  
+   "use strict";
    this.paper = paper;
 
    this.keepLastGoodAction = true;
@@ -456,8 +457,3 @@ function DragAndDropSystem(params)
 
    return dragAndDrop;
 };
-
-
-
-
-

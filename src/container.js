@@ -23,9 +23,10 @@
          quand on lui prend le sien.
   sourceElemArray : Utile seulement dans le cas type="source", définit l'objet source à dupliquer.
 */
-function _container(dragAndDropSystem,ident,cx, cy, nbPlaces, widthPlace, heightPlace, direction, align, dropMode, dragDisplayMode,
+var _container = function(dragAndDropSystem,ident,cx, cy, nbPlaces, widthPlace, heightPlace, direction, align, dropMode, dragDisplayMode,
                    placeBackgroundArray, type, sourceElemArray)
 {
+   "use strict";
    this.dragAndDropSystem = dragAndDropSystem;
    this.ident = ident;
    this.cx = cx;
@@ -173,7 +174,7 @@ function _container(dragAndDropSystem,ident,cx, cy, nbPlaces, widthPlace, height
    */
    this.getElementsAfterDrop = function(srcCont, srcPos, dstCont, dstPos, dropType)
    {
-      var res = new Array();
+      var res = [];
       for (var i = 0; i < this.nbPlaces; i++)
          res[i] = this.draggableElements[i];
       res[this.nbPlaces] = null;
@@ -185,7 +186,7 @@ function _container(dragAndDropSystem,ident,cx, cy, nbPlaces, widthPlace, height
             res[srcPos] = null;
          else
          {
-            var i = srcPos;
+            i = srcPos;
             while(i+1 <= this.nbPlaces && this.draggableElements[i] != null)
             {
                res[i] = res[i+1];
@@ -205,7 +206,7 @@ function _container(dragAndDropSystem,ident,cx, cy, nbPlaces, widthPlace, height
             var end = dstPos;
             while(end < this.nbPlaces && res[end] != null)
                end++;
-            for (var i = end; i > dstPos; i--)
+            for (i = end; i > dstPos; i--)
                res[i] = res[i-1];
             res[dstPos] = el; 
          }
@@ -227,7 +228,7 @@ function _container(dragAndDropSystem,ident,cx, cy, nbPlaces, widthPlace, height
 
 //Contents
 
-   this.draggableElements = new Array();
+   this.draggableElements = [];
    for (var i = 0; i < this.nbMax; i++)
       this.draggableElements[i] = null;
 
@@ -247,10 +248,10 @@ function _container(dragAndDropSystem,ident,cx, cy, nbPlaces, widthPlace, height
 
    if (this.type == 'source')
    {
-      var cloneArray = new Array();
-      for (var i = 0; i < this.sourceElemArray.length; i++)
+      var cloneArray = [];
+      for (i = 0; i < this.sourceElemArray.length; i++)
          cloneArray[i] = this.sourceElemArray[i].clone();
-      component(this.cx, this.cy, cloneArray,this.dragAndDropSystem.paper)
+      component(this.cx, this.cy, cloneArray,this.dragAndDropSystem.paper);
 
       this.createDraggable(this.ident, 0, this.sourceElemArray);  
    }
@@ -258,7 +259,7 @@ function _container(dragAndDropSystem,ident,cx, cy, nbPlaces, widthPlace, height
 
    this.getObjects = function()
    {
-      var res = new Array();
+      var res = [];
       for (var i = 0; i < this.nbPlaces; i++)
          if (this.draggableElements[i] != null)
             res[i] = this.draggableElements[i].ident;
@@ -331,9 +332,9 @@ this.updateSource = function()
       this.sourceCompo.placeAt(0,0);
 
       var newSize = this.sourceCompo.elems.length;
-      for (var i = this.sourceCompo.nbEl; i < newSize; i++)
+      for (i = this.sourceCompo.nbEl; i < newSize; i++)
          this.sourceCompo.elems[i].remove();
-      for (var i = this.sourceCompo.nbEl; i < newSize; i++)
+      for (i = this.sourceCompo.nbEl; i < newSize; i++)
          this.sourceCompo.elems.pop();
 
       this.createDraggable(this.sourceIdent, 0 ,this.sourceCompo.elems);
@@ -371,11 +372,12 @@ this.updateSource = function()
    {
       this.placeHolder.hide();
       var intermed = this.getElementsAfterDrop(srcCont, srcPos, dstCont, dstPos, dropType);
+      var i, center;
 
       if (this.dragDisplayMode == 'preview')       
-         for (var i = 0; i <= this.nbPlaces; i++)
+         for (i = 0; i <= this.nbPlaces; i++)
          {
-            var center = this.placeCenter(i);
+            center = this.placeCenter(i);
             if (intermed[i] != null)
                if (intermed[i] == srcCont.draggableElements[srcPos])  
                {
@@ -398,7 +400,7 @@ this.updateSource = function()
          if (this.dropMode == 'replace')
             return;
 
-         for (var i = 0; i < this.nbPlaces; i++)
+         for (i = 0; i < this.nbPlaces; i++)
             if (this.draggableElements[i] != null)
                this.draggableElements[i].show();
 
@@ -407,7 +409,7 @@ this.updateSource = function()
             var iPlaceIns = srcPos;
             while(iPlaceIns+1 < this.nbPlaces && this.draggableElements[iPlaceIns+1] != null)
             {
-               var center = this.placeCenter(iPlaceIns);
+               center = this.placeCenter(iPlaceIns);
                this.draggableElements[iPlaceIns+1].component.placeAtWithAnim(center[0],center[1],this.timeAnim);
                iPlaceIns++;
             }
