@@ -24,7 +24,7 @@
   sourceElemArray : Utile seulement dans le cas type="source", définit l'objet source à dupliquer.
 */
 var _container = function(dragAndDropSystem,ident,cx, cy, nbPlaces, widthPlace, heightPlace, direction, align, dropMode, dragDisplayMode,
-                   placeBackgroundArray, type, sourceElemArray)
+                   placeBackgroundArray, type, sourceElemArray, places)
 {
    "use strict";
    this.dragAndDropSystem = dragAndDropSystem;
@@ -39,6 +39,7 @@ var _container = function(dragAndDropSystem,ident,cx, cy, nbPlaces, widthPlace, 
    this.dropMode = dropMode;
    this.dragDisplayMode = dragDisplayMode;
    this.type = type;
+   this.places = places;
 
    this.placeHolder = component(0,0,
       [dragAndDropSystem.paper.rect(-widthPlace/2,-heightPlace/2,widthPlace,heightPlace)
@@ -80,6 +81,9 @@ var _container = function(dragAndDropSystem,ident,cx, cy, nbPlaces, widthPlace, 
    this.placeCenter = function(iPlace)
    {
       var w = this.widthPlace, h = this.heightPlace;
+      if (this.places != undefined) {
+         return this.places[iPlace];
+      }
       if (direction == 'horizontal')
          if (align == 'left')
             return [this.cx + ((2*iPlace + 1 - this.nbPlaces)*w)/2, this.cy];
@@ -511,6 +515,6 @@ function container(_params)
       params.cx, params.cy, params.nbPlaces, params.widthPlace, params.heightPlace,
       params.direction, params.align, 
       params.dropMode, params.dragDisplayMode,
-      params.placeBackgroundArray, params.type, params.sourceElemArray);
+      params.placeBackgroundArray, params.type, params.sourceElemArray, params.places);
 }
 
