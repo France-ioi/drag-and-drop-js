@@ -356,18 +356,12 @@ function _DragAndDropSystem(paper)
          if (this.containers[iCont] == dstCont)
             iDstCont = iCont;
       if (iDstCont != -1)
-         if (dropType == 'replace' && newObjects[iDstCont][dstPos] != null)
-            if (newObjects[iDstCont][dstPos] != srcCont.draggableElements[srcPos])
+         if (dropType == 'replace' && newObjects[iDstCont][dstPos] != null && dstCont.draggableElements[dstPos] != null)
+            if (newObjects[iDstCont][dstPos] != dstCont.draggableElements[dstPos])
             {        
-               var elEjected = newObjects[iDstCont][dstPos];
+               var elEjected = dstCont.draggableElements[dstPos];
                var previousCont = this.containers[iDstCont];
-               // We have to find its position after the movement
-               var previousPos = -1;
-               for (var iPlace = 0; iPlace < this.containers[iDstCont].length; iPlace++)
-                  if (this.containers[iDstCont][iPlace] == elEjected)
-                     previousPos = iPlace
-               if (previousPos == -1)
-                  alert('did not find previous position for ejection');
+               var previousPos = dstPos;
                ejected = {'refEl' : elEjected, 'previousCont' : previousCont, 'previousPos' : previousPos};  
             }
 
