@@ -109,7 +109,11 @@ function _component(cx, cy, arrayElems, paper)
 		var newArr = new Array();
 		for(var i = 0; i < this.nbEl; i++)	
 		{
-			newArr[i] = this.elems[i].clone().attr('transform',this.oldTransforms[i]);
+			newArr[i] = this.elems[i].clone();
+         if (this.oldTransforms[i] != undefined)
+         {
+            newArr[i] = newArr[i].attr('transform',this.oldTransforms[i]);
+         }
 		}
 		return new _component(this.cx,this.cy,newArr,this.paper);	
 	};
