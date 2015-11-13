@@ -34,17 +34,17 @@ function component (elem) {
 }
 
 function Component (element) {
-    var paper, nonSetElement, Element, groupNode;
+    var paper, Element, groupNode;
     if (element instanceof Array)
         throw "A Raphael element is required";
-    var paper = this.paper = element.paper;
-    // Get to the Element constructor so we can build a group.  The loop
-    // is required when we are passed nested sets.
-    nonSetElement = element;
-    while (nonSetElement.type === 'set')
-        nonSetElement = nonSetElement[0];
-    Element = nonSetElement.constructor;
     this.element = element;
+    this.cx = 0;
+    this.cy = 0;
+    this.opacity = 1;
+    paper = this.paper = element.paper;
+    // Retrieve the Raphael Element constructor.
+    Element = paper.raphael.el.constructor;
+    // Create a group VML or SVG node.
     if (paper.raphael.vml) {
         this.vml = true;
         groupNode = document.createElement("group");
@@ -53,12 +53,14 @@ function Component (element) {
         this.vml = false;
         groupNode = document.createElementNS("http://www.w3.org/2000/svg", "g");
     }
+    // Add the group node to the canvas.
     paper.canvas.appendChild(groupNode);
+    // Wrap a Raphael element around the group node; this is not directly
+    // supported by Raphael, but it works for all our use cases.
     this.group = new Element(groupNode, paper);
+    // Move the element's DOM nodes (recursing into Raphael sets) inside the
+    // group node.
     this.addElement(element);
-    this.cx = 0;
-    this.cy = 0;
-    this.opacity = 1;
 }
 
 Component.prototype.addElement = function (element) {
