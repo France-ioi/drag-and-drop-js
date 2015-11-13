@@ -37,7 +37,7 @@ function Component (element) {
     var paper, nonSetElement, Element, groupNode;
     if (element instanceof Array)
         throw "A Raphael element is required";
-    paper = element.paper;
+    var paper = this.paper = element.paper;
     // Get to the Element constructor so we can build a group.  The loop
     // is required when we are passed nested sets.
     nonSetElement = element;
@@ -68,6 +68,13 @@ Component.prototype.addElement = function (element) {
         }
     } else {
         this.group.node.appendChild(element.node);
+        if (!this.vml && element.type === 'text') {
+            // When using SVG, overlay a transparent rect over text elements to
+            // prevent user interaction with the text (cursor change, selection).
+            var bb = element.getBBox();
+            var overlay = this.paper.rect(bb.x,bb.y,bb.width,bb.height).attr('fill','red').attr('opacity',0);
+            this.group.node.appendChild(overlay.node);
+        }
     }
 };
 
