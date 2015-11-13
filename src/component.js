@@ -34,12 +34,17 @@ function component (elem) {
 }
 
 function Component (element) {
-    var paper = element.paper;
+    var paper, nonSetElement, Element, groupNode;
     if (element instanceof Array)
         throw "A Raphael element is required";
-    var Element = (element.type === 'set' ? element[0] : element).constructor;
+    paper = element.paper;
+    // Get to the Element constructor so we can build a group.  The loop
+    // is required when we are passed nested sets.
+    nonSetElement = element;
+    while (nonSetElement.type === 'set')
+        nonSetElement = nonSetElement[0];
+    Element = nonSetElement.constructor;
     this.element = element;
-    var groupNode, skew;
     if (paper.raphael.vml) {
         this.vml = true;
         groupNode = document.createElement("group");
