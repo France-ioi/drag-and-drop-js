@@ -1,4 +1,14 @@
+'use strict';
+
+// A Component is a wrapper around a single Raphael element (which can be
+// a set) that allows setting the position the element.
+// The implementation relies on the Raphael group extension to move many
+// elements as one, which is required in particular for IE6 (which otherwise
+// moves elements individually, partially redrawing the canvas between moves).
+
 /*
+  Outdated comment:
+
   Component : Permet de manipuler un objet graphique composé de plusieurs
   petits objets Raphael, donnés dans le tableau arrayElems. Ces sous-objets
   doivent être donnés en coordonnées relatives : si un objet du tableau est
@@ -11,152 +21,115 @@
     tous les autres subissent le même déplacement. Ainsi on voit
     tous les objets bouger ensemble, comme si c'était un seul gros objet.
 */
-function _component(cx, cy, arrayElems, paper)
-{
-   var that = this;
 
+var utils = require('./utils');
 
-   this.cx = cx;
-   this.cy = cy;
-   this.elems = arrayElems;
-   this.paper = paper;
+module.exports = component;
 
-   this.nbEl = this.elems.length;
-
-	for(var iEl = 0; iEl < this.nbEl; iEl++)
-	{
-		if(this.elems[iEl].type == 'text')
-		{
-			var bb = this.elems[iEl].getBBox();
-			this.elems.push(paper.rect(bb.x,bb.y,bb.width,bb.height).attr('fill','red').attr('opacity',0));
-		}
-	}
-
-
-        /*
-	  Les sous-objets subissent des déplacements en utilisant la chaine de déplacements
-          Raphael (c'est une chaine de caractêres qui concatêne toutes les transformations
-          à appliquer à l'objet). Pour ne pas rendre cette chaine tres longue, on se souvient
-          de la transformation initiale de l'objet et on applique une translation de (cx,cy).
-        */
-	this.oldTransforms = new Array();
-	for(var i = 0; i < this.elems.length; i++)
-	{
-		this.elems[i].toFront();
-		this.oldTransforms[i] = this.elems[i].transform();
-		this.elems[i].transform('t' + this.cx + ',' + this.cy + this.oldTransforms[i]);
-	}
-
-
-   this.placeAt = function(cx,cy)
-   {
-      this.cx = cx;
-      this.cy = cy;
-
-      for (var i = 0; i < this.elems.length; i++)
-         this.elems[i].transform('t' + this.cx + ',' + this.cy + this.oldTransforms[i]);
-      return this;
-   };
-
-   var animation = function(i, time) 
-   {
-      return Raphael.animation({'transform' : 't' + that.cx + ',' + that.cy + that.oldTransforms[i]}, time, '');
-   };
-
-   this.placeAtWithAnim = function(cx,cy,time)
-   {
-      this.cx = cx;
-      this.cy = cy;
-
-      for (var i = 0; i < this.elems.length; i++)
-         this.elems[i].animate(animation(i,time));
-      return this;      
-   };
-
-   this.move = function(dx,dy) { this.placeAt(this.cx+dx,this.cy+dy); };
-   this.moveWithAnim = function(dx,dy,time) { this.placeAt(this.cx+dx,this.cy+dy,time); };
-
-
-        /*
-	  On retransmet aux éléments fils les callbacks drag&drop
-          pour wraper le système de drag&drop de Raphael js.
-	  Lorsqu'on écrit "this" dans un de ces callbacks,
-	  il faut voir que cela correspond au super objet.
-	  (voir la définition de start, move et up dans
-	  dragAndDropSystem.js)
-        */
-	this.drag = function(moveDrag, startDrag, upDrag)
-	{
-		that.hasReallyMoved = false;
-		this.startDrag = startDrag;
-		this.moveDrag = moveDrag;
-		this.upDrag = upDrag;
-
-      for (var i = 0; i < this.elems.length; i++)
-         this.elems[i].drag(function(dx,dy){that.moveDrag(dx,dy);}, 
-                            function(){that.startDrag();}, 
-                            function(){that.upDrag();});
-      return this;
-   };
-
-
-        /*
-	  Recrée un super-objet identique, remis en position (cx,cy), dont
-          les sous-objets sont obtenus avec le .clone() de Raphael.
-	*/
-	this.clone = function()
-	{
-		var newArr = new Array();
-		for(var i = 0; i < this.nbEl; i++)	
-		{
-			newArr[i] = this.elems[i].clone();
-         if (this.oldTransforms[i] != undefined)
-         {
-            newArr[i] = newArr[i].attr('transform',this.oldTransforms[i]);
-         }
-		}
-		return new _component(this.cx,this.cy,newArr,this.paper);	
-	};
-
-   this.remove = function()
-   {
-      for (var i = 0; i < this.elems.length; i++)  
-         this.elems[i].remove();    
-   };
-
-   this.toFront = function()
-   {
-      for (var i = 0; i < this.elems.length; i++)
-         this.elems[i].toFront();
-      
-   };
-   
-   this.show = function()
-   {
-      for (var i =0; i < this.nbEl; i++)  
-         if (!this.elems[i].attr('transparent')) { // TODO: save original opacity attribute
-            this.elems[i].attr('opacity','1');
-         }
-   };
-
-   this.hide = function()
-   {
-      for (var i = 0; i < this.nbEl; i++) 
-         this.elems[i].attr('opacity','0');  
-   };
-
-   this.halfHide = function()
-   {
-      for (var i = 0; i < this.nbEl; i++) 
-         if (!this.elems[i].attr('transparent')) {
-            this.elems[i].attr('opacity','0.3');
-         }
-   };
+function component (elem) {
+    // If a component is passed, return it unchanged.
+    if (elem.constructor === Component)
+        return elem;
+    return new Component(elem);
 }
 
-function component(cx, cy, arrayElems,paper){ return new _component(cx, cy, arrayElems,paper); }
+function Component (element) {
+    var paper = element.paper;
+    if (element instanceof Array)
+        throw "A Raphael element is required";
+    var Element = (element.type === 'set' ? element[0] : element).constructor;
+    this.element = element;
+    var groupNode, skew;
+    if (paper.raphael.vml) {
+        this.vml = true;
+        groupNode = document.createElement("group");
+        groupNode.style.position = 'absolute';
+    } else {
+        this.vml = false;
+        groupNode = document.createElementNS("http://www.w3.org/2000/svg", "g");
+    }
+    paper.canvas.appendChild(groupNode);
+    this.group = new Element(groupNode, paper);
+    this.addElement(element);
+    this.cx = 0;
+    this.cy = 0;
+    this.opacity = 1;
+}
 
+Component.prototype.addElement = function (element) {
+    if (element.type === 'set') {
+        for (var i = 0, j = element.length; i < j; i++) {
+            this.addElement(element[i]);
+        }
+    } else {
+        this.group.node.appendChild(element.node);
+    }
+};
 
+Component.prototype.clone = function () {
+    var clone = new Component(this.element.clone());
+    clone.placeAt(this.cx, this.cy);
+    return clone;
+};
 
+Component.prototype.placeAt = function (cx, cy) {
+    this.cx = cx;
+    this.cy = cy;
+    if (this.vml) {
+        this.group.node.style.left = cx + 'px';
+        this.group.node.style.top = cy + 'px';
+    } else {
+        this.group.transform('t' + cx + ',' + cy);
+    }
+    return this;
+};
 
+Component.prototype.placeAtWithAnim = function (cx, cy, time) {
+    this.cx = cx;
+    this.cy = cy;
+    this.group.animate({
+        transform: 't' + cx + ',' + cy
+    }, time, '');
+    return this;
+};
 
+Component.prototype.remove = function () {
+    // Removing the group will remove the nested element.
+    this.group.remove();
+};
+
+Component.prototype.show = function () {
+    if (this.opacity !== 1) {
+        this.attr('opacity', 1);
+        this.opacity = 1;
+    }
+    this.group.show();
+    return this;
+};
+
+Component.prototype.hide = function () {
+    this.group.hide();
+    return this;
+};
+
+Component.prototype.halfHide = function () {
+    this.attr('opacity', 0.3);
+    this.opacity = 0.3;
+    return this;
+};
+
+Component.prototype.drag = function (moveDrag, startDrag, upDrag) {
+    this.group.drag(moveDrag, startDrag, upDrag);
+    return this;
+};
+
+Component.prototype.toFront = function () {
+    this.group.toFront();
+    return this;
+};
+
+if (utils.ie6) {
+    // Disable animations, IE6 would animate from (0,0) to the new position,
+    // rather than from the old position to the new one.
+    Component.prototype.placeAtWithAnim = Component.prototype.placeAt;
+}
