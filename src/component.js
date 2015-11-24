@@ -58,6 +58,19 @@ function Component (element) {
     // Wrap a Raphael element around the group node; this is not directly
     // supported by Raphael, but it works for all our use cases.
     this.group = new Element(groupNode, paper);
+    if (this.vml) {
+        // VML only fix: allow applying a pure translation transform to the group.
+        var self = this;
+        this.group.transform = function (t) {
+            if (typeof t === 'undefined')
+                return [['t', self.cx, self.cy]];
+            if (t.length === 1 && t[0][0] === 't') {
+                self.placeAt(t[0][1], t[0][2]);
+                return;
+            }
+            alert('unsupported VML group transform');
+        }
+    }
     // Move the element's DOM nodes (recursing into Raphael sets) inside the
     // group node.
     this.addElement(element);
