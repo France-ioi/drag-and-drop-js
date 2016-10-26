@@ -31,7 +31,7 @@ for(iVal = 0; iVal < vals.length; iVal++)
 {
 	circles[iVal] = paper.circle(0,0,20).attr('fill','yellow');
 	var t = paper.text(0,0,vals[iVal]);
-	list.createDraggable(vals[iVal], iVal, [circles[iVal],t]);
+	list.createAt(iVal, vals[iVal], paper.set([circles[iVal], t]));
 }
 
 
