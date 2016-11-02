@@ -127,7 +127,7 @@ Component.prototype.remove = function () {
 
 Component.prototype.show = function () {
     if (this.opacity !== 1) {
-        this.attr('opacity', 1);
+        this.group.attr('opacity', 1);
         this.opacity = 1;
     }
     this.group.show();
@@ -140,7 +140,7 @@ Component.prototype.hide = function () {
 };
 
 Component.prototype.halfHide = function () {
-    this.attr('opacity', 0.3);
+    this.group.attr('opacity', 0.3);
     this.opacity = 0.3;
     return this;
 };
