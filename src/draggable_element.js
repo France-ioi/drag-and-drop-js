@@ -55,11 +55,19 @@ DraggableElement.prototype.hide = function () {
     this.component.hide();
 };
 DraggableElement.prototype._startDragCallback = function () {
+    var dragNotEnded = false; 
+    if(this.dragState) {
+        // If dragState exists, we are starting a drag when the previous one hasn't ended.
+        // This happens when dragging to a different iframe, releasing, coming back, and clicking.
+        // This information is stored in dragState below.
+        dragNotEnded = true;
+    }
     if (this.dragAndDropSystem.canBeTaken(this.container.ident, this.iPlace)) {
         this.dragState = {
             ox: this.component.cx,
             oy: this.component.cy,
-            hasReallyMoved: false
+            hasReallyMoved: false,
+            dragNotEnded: dragNotEnded
         };
         this.toFront();
     }
@@ -94,7 +102,9 @@ DraggableElement.prototype._endDragCallback = function () {
     this.dragState = null;
 
     // If the item was not dragged over the threshold, reset its position.
-    if (!state.hasReallyMoved) {
+    // Bug fix: do not do this if the previous drag did not end. If the out-of-frame bug
+    // has occurred (see above), we expect one click to be sufficient to release the object.
+    if (!state.hasReallyMoved && !state.dragNotEnded) {
         this.component.placeAt(state.ox, state.oy);
         return;
     }
