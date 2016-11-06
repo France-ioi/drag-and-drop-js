@@ -208,6 +208,9 @@ DragAndDropSystem.prototype.hasBeenTaken = function (el) {
 };
 
 DragAndDropSystem.prototype.hasBeenMoved = function (el, cx, cy) {
+    if(this.disabled) {
+        return;
+    }
     var action = this.getCorrespondingAction(el, cx, cy);
     var elOver = this.getElementOver(el, cx, cy);
     if (this.lastOver !== elOver) {
@@ -229,6 +232,9 @@ DragAndDropSystem.prototype.hasBeenMoved = function (el, cx, cy) {
 };
 
 DragAndDropSystem.prototype.hasBeenDropped = function (el, cx, cy) {
+    if(this.disabled) {
+        return;
+    }
     this.hideIndicators();
     var action = this.getCorrespondingAction(el, cx, cy);
     var srcCont = el.container,
@@ -329,6 +335,10 @@ DragAndDropSystem.prototype.canBeTaken = function (containerId, iPlace) {
 };
 DragAndDropSystem.prototype.actionIfDropped = function (srcContId, srcPos, dstContId, dstPos, dropType) {
     return true;
+};
+
+DragAndDropSystem.prototype.disable = function () {
+    this.disabled = true;
 };
 
 // User callbacks
