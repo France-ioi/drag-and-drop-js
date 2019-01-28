@@ -13,17 +13,31 @@ function DraggableElement(container, iPlace, ident, element) {
     this.dragState = null;
     this.crossShape = null;
     var self = this;
-    this.component.drag(
-        function (dx, dy) {
-            return self._moveDragCallback(dx, dy);
-        },
-        function () {
-            return self._startDragCallback();
-        },
-        function () {
-            return self._endDragCallback();
-        });
-}
+    initDrag(this.component,container,iPlace,self);
+//     this.component.drag(
+//         function (dx, dy) {
+//             return self._moveDragCallback(dx, dy);
+//         },
+//         function () {
+//             return self._startDragCallback();
+//         },
+//         function () {
+//             return self._endDragCallback();
+//         });
+};
+
+function initDrag(comp,container,iPlace,o) {
+    comp.drag(
+        function(container,iPlace){
+            return o._moveDragCallback(container,iPlace)},
+        function(){
+            return o._startDragCallback()},
+        function(){
+            comp.undrag();
+            initDrag(comp,container,iPlace,o);
+            return o._endDragCallback()})
+};
+
 
 DraggableElement.prototype.remove = function () {
     this.component.remove();

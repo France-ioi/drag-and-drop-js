@@ -57,7 +57,7 @@ var mainScriptOpts = {
     entry: 'src/main.js',
     output: 'drag-and-drop.js',
     watch: false,
-    uglify: false
+    uglify: true
 };
 
 gulp.task('build', [], function () {

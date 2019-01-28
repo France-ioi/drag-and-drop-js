@@ -150,6 +150,11 @@ Component.prototype.drag = function (moveDrag, startDrag, upDrag) {
     return this;
 };
 
+Component.prototype.undrag = function(){
+    this.group.undrag()
+    return this
+};
+
 Component.prototype.toFront = function () {
     this.group.toFront();
     return this;
