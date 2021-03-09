@@ -36,7 +36,7 @@ function buildScript (options) {
             .pipe(sourcemaps.write("."))
             .pipe(chmod(644))
             .pipe(eol("\n"))
-            .pipe(gulp.dest("dist"));
+            .pipe(gulp.dest("dst"));
     }
 
     bundler.on('log', gutil.log);
@@ -60,22 +60,26 @@ var mainScriptOpts = {
     uglify: true
 };
 
-gulp.task('build', [], function () {
+gulp.task('build', gulp.series(function (done) {
     buildScript(mainScriptOpts);
-});
+    done();
+}));
 
-gulp.task('build_min', [], function () {
+gulp.task('build_min', gulp.series(function (done) {
     buildScript(uglified(mainScriptOpts))
-});
+    done();
+}));
 
-gulp.task('watch', [], function () {
+gulp.task('watch', gulp.series(function (done) {
     buildScript(watched(mainScriptOpts));
-});
+    done();
+}));
 
-gulp.task('lint', function() {
+gulp.task('lint', gulp.series(function(done) {
   return gulp.src('./src/*.js')
     .pipe(jshint())
     .pipe(jshint.reporter('jshint-stylish'));
-});
+    done();
+}));
 
-gulp.task('default', ['build']);
+gulp.task('default', gulp.series('build'));
