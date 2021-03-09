@@ -146,12 +146,13 @@ Component.prototype.halfHide = function () {
 };
 
 Component.prototype.drag = function (moveDrag, startDrag, upDrag) {
-    this.group.drag(moveDrag, startDrag, upDrag);
+    Beav.dragWithTouch(this.group,moveDrag, startDrag, upDrag);
+    // this.group.drag(moveDrag, startDrag, upDrag);
     return this;
 };
 
 Component.prototype.undrag = function(){
-    this.group.undrag()
+    this.group.undrag();
     return this
 };
 
