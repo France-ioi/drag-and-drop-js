@@ -14,19 +14,10 @@ function DraggableElement(container, iPlace, ident, element) {
     this.crossShape = null;
     var self = this;
     initDrag(this.component,container,iPlace,self);
-//     this.component.drag(
-//         function (dx, dy) {
-//             return self._moveDragCallback(dx, dy);
-//         },
-//         function () {
-//             return self._startDragCallback();
-//         },
-//         function () {
-//             return self._endDragCallback();
-//         });
 };
 
 function initDrag(comp,container,iPlace,o) {
+    var displayHelper = container.dragAndDropSystem.displayHelper;
     comp.drag(
         function(container,iPlace){
             return o._moveDragCallback(container,iPlace)},
@@ -35,7 +26,8 @@ function initDrag(comp,container,iPlace,o) {
         function(){
             comp.undrag();
             initDrag(comp,container,iPlace,o);
-            return o._endDragCallback()})
+            return o._endDragCallback()},
+        displayHelper)
 };
 
 

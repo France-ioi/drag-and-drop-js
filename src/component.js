@@ -42,6 +42,7 @@ function Component (element) {
     this.cy = 0;
     this.opacity = 1;
     paper = this.paper = element.paper;
+    // this.dragAndDropSystem = element.dragAndDropSystem;
     // Retrieve the Raphael Element constructor.
     Element = paper.raphael.el.constructor;
     // Create a group VML or SVG node.
@@ -145,8 +146,12 @@ Component.prototype.halfHide = function () {
     return this;
 };
 
-Component.prototype.drag = function (moveDrag, startDrag, upDrag) {
-    Beav.dragWithTouch(this.group,moveDrag, startDrag, upDrag);
+Component.prototype.drag = function (moveDrag, startDrag, upDrag, displayHelper) {
+    // var displayHelper = this.dragAndDropSystem.displayHelper;
+    // console.log('check')
+    // console.log(this.dragAndDropSystem)
+    // var scale = displayHelper.scalingFactor || 1;
+    Beav.dragWithTouch(this.group,moveDrag, startDrag, upDrag, displayHelper);
     // this.group.drag(moveDrag, startDrag, upDrag);
     return this;
 };

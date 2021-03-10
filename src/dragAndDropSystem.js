@@ -48,6 +48,7 @@ function DragAndDropSystem (params) {
         alert('paper should be defined');
     }
     this.paper = params.paper;
+    this.displayHelper = params.displayHelper; 
 
     this.keepLastGoodAction = true;
     this.containers = [];
